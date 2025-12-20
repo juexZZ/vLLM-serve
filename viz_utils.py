@@ -95,7 +95,7 @@ def plot_bounding_boxes(im, bounding_boxes, save_path=None):
     # Parsing out the markdown fencing
     bounding_boxes = parse_json(bounding_boxes)
 
-    font = ImageFont.truetype("NotoSansCJK-Regular.ttc", size=14)
+    font = ImageFont.load_default()
 
     try:
       json_output = ast.literal_eval(bounding_boxes)
@@ -142,6 +142,43 @@ def plot_bounding_boxes(im, bounding_boxes, save_path=None):
         img.show()
 
 
+def parse_json_with_recovery(text):
+  """Parse JSON with error recovery for incomplete responses.
+  
+  Args:
+      text: JSON string to parse
+      
+  Returns:
+      Parsed JSON data or None if parsing and recovery both fail
+  """
+  try:
+    return json.loads(text)
+  except json.JSONDecodeError as e:
+    print(f"Warning: JSON parsing failed: {e}")
+    print("Attempting to recover partial data...")
+    
+    # Try to truncate to last complete object
+    try:
+      # Find the last complete object by looking for "},\n" or "}]"
+      text = text.strip()
+      if text.endswith(','):
+        text = text[:-1]  # Remove trailing comma
+      
+      # If it's an array, try to close it properly
+      if text.startswith('['):
+        # Find last complete object
+        last_brace = text.rfind('}')
+        if last_brace != -1:
+          text = text[:last_brace + 1] + ']'
+      
+      data = json.loads(text)
+      print(f"Successfully recovered {len(data)} items from partial response")
+      return data
+    except Exception as recovery_error:
+      print(f"Could not recover data: {recovery_error}")
+      return None
+
+
 def plot_points(im, text, save_path=None):
   img = im
   width, height = img.size
@@ -164,7 +201,8 @@ def plot_points(im, text, save_path=None):
         img.show()
     return
 
-  font = ImageFont.truetype("NotoSansCJK-Regular.ttc", size=14)
+  # font = ImageFont.truetype("NotoSansCJK-Regular.ttc", size=14)
+  font = ImageFont.load_default()
 
   for i, point in enumerate(points):
     color = colors[i % len(colors)]
@@ -191,11 +229,26 @@ def plot_points_json(im, text, save_path=None):
     'beige', 'turquoise', 'cyan', 'magenta', 'lime', 'navy', 'maroon', 'teal',
     'olive', 'coral', 'lavender', 'violet', 'gold', 'silver',
   ] + additional_colors
-  font = ImageFont.truetype("NotoSansCJK-Regular.ttc", size=14)
+  # font = ImageFont.truetype("NotoSansCJK-Regular.ttc", size=14)
+  
+  font = ImageFont.load_default()
 
   text = text.replace('```json', '')
   text = text.replace('```', '')
-  data = json.loads(text)
+  
+  # Parse JSON with error recovery
+  data = parse_json_with_recovery(text)
+  
+  if data is None:
+    print("Saving image without annotations...")
+    if save_path:
+      os.makedirs(os.path.dirname(save_path), exist_ok=True)
+      img.save(save_path)
+      print(f"Saved visualization to {save_path}")
+    else:
+      img.show()
+    return
+  
   for item in data:
     point_2d = item['point_2d']
     label = item['label']

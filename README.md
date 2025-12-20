@@ -35,6 +35,7 @@ Then run (just an example):
 ```bash
 test_mm.py
 ```
+Finding: max-model-len greatly affects response speed...
 
 Simple example:
 ```Python

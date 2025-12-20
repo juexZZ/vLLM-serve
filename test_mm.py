@@ -14,8 +14,8 @@ from viz_utils import (
     parse_json
 )
 
-# MODEL_NAME = "Qwen/Qwen3-VL-235B-A22B-Instruct"
-MODEL_NAME = "Qwen/Qwen3-VL-8B-Instruct"
+MODEL_NAME = "Qwen/Qwen3-VL-235B-A22B-Instruct"
+# MODEL_NAME = "Qwen/Qwen3-VL-8B-Instruct"
 
 openai_api_key = "EMPTY"
 openai_api_base = "http://localhost:8000/v1"
@@ -75,6 +75,12 @@ def inference_with_openai_api(img_url, prompt, min_pixels=64 * 32 * 32, max_pixe
     completion = client.chat.completions.create(
         model=MODEL_NAME,
         messages=messages,
+        max_tokens=32768,
+        # temperature=0.6,
+        # top_p=0.95,
+        # extra_body={
+        #     "top_k": 20,
+        # },
     )
     return completion.choices[0].message.content
 
