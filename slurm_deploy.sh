@@ -5,7 +5,7 @@
 #SBATCH --time=12:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gres=gpu:8
+#SBATCH --gres=gpu:4
 #SBATCH --constraint=h200
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=110G
@@ -26,7 +26,8 @@ echo "Launching vLLM serve inside Singularity..."
 
 # Use srun to attach resources to the containerized process
 singularity exec --nv \
-  --overlay "${OVERLAY_PATH}" /bin/bash <<'SINGULARITY_SCRIPT'
+  --overlay "${OVERLAY_PATH}" \
+  ${CONTAINER_SIF} /bin/bash <<'SINGULARITY_SCRIPT'
 
 # Environment inside the container
 export HF_HOME="/scratch/$USER/hf-cache"
@@ -54,5 +55,6 @@ vllm serve "$MODEL_NAME" \
   --tensor-parallel-size "$TP_SIZE" \
   --mm-encoder-tp-mode data \
   --limit-mm-per-prompt.video 0 \
+  --max-model-len 32768 \
   --async-scheduling
 SINGULARITY_SCRIPT

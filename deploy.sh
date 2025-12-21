@@ -26,18 +26,18 @@ echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 NUM_GPU="$(nvidia-smi --list-gpus | wc -l)"
 echo "NUM_GPU=$NUM_GPU"
 
-# vllm serve "$MODEL_NAME" \
-#   --tensor-parallel-size "$NUM_GPU" \
-#   --mm-encoder-tp-mode data \
-#   --limit-mm-per-prompt.video 0 \
-#   --async-scheduling
-
-# for deployment, 8 gpu (example)
-MODEL_NAME="Qwen/Qwen3-VL-235B-A22B-Instruct" # for real deployment
 vllm serve "$MODEL_NAME" \
-  --tensor-parallel-size 8 \
+  --tensor-parallel-size "$NUM_GPU" \
   --mm-encoder-tp-mode data \
   --limit-mm-per-prompt.video 0 \
-  --max-model-len 128000 \
   --async-scheduling
+
+# for deployment, 8 gpu (example)
+# MODEL_NAME="Qwen/Qwen3-VL-235B-A22B-Instruct" # for real deployment
+# vllm serve "$MODEL_NAME" \
+#   --tensor-parallel-size 8 \
+#   --mm-encoder-tp-mode data \
+#   --limit-mm-per-prompt.video 0 \
+#   --max-model-len 128000 \
+#   --async-scheduling
 '
