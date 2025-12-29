@@ -1,0 +1,56 @@
+model_id: Qwen/Qwen3-VL-8B-Instruct
+
+image_max_resolution: 768
+eval_pointing_specs:
+  - hf_path: allenai/pixmo-points-eval
+    split: test # NOTE: this is the hold out eval set from the training set
+    data_dir: /vast/jz4725/torch_datasets/pixmo_datasets/pixmo-points-eval
+    image_column: image
+    context_image_columns: []
+    gt_mask_column: masks
+    points_column: points
+    point_scale: 100.0
+    max_num_points: 10
+    streaming: false
+  # - hf_path: juexzz/arkitscenes-crossview-inpaint
+  #   split: validation
+  #   data_dir: ${HF_HOME}/juexzz___arkitscenes-crossview-inpaint/default/0.0.0/aa4c661fa0e14ad6e81df236343e88d370caa223
+  #   image_column: image_b
+  #   context_image_columns:
+  #     - inpaint_a
+  #   gt_mask_column: mask_b
+  #   points_column: point_b
+  #   point_scale: 1.0
+  #   max_num_points: 10
+  #   label_column: label
+  #   label_cased_column: label
+  #   formatter_kwargs:
+  #     prompt_templates: change_pointing
+  
+  # - hf_path: ai4ce/ade20k_spatial_inpaint
+  #   split: validation
+  #   data_dir: ${HF_HOME}/ai4ce___ade20k_spatial_inpaint/default/0.0.0/969ec4489a3ecbd270d8bf9ba5376fd10d7f2f9e
+  #   image_column: image_src
+  #   context_image_columns: 
+  #     - image_tgt
+  #   gt_mask_column: mask
+  #   points_column: point
+  #   point_scale: 1.0
+  #   max_num_points: 10
+  #   streaming: false
+  #   label_column: object
+  #   label_cased_column: object
+  #   formatter_kwargs:
+  #     prompt_templates: change_pointing
+
+
+
+max_train_examples:
+max_eval_examples:
+base_seed: 42
+
+run_name: molmo2-8B-eval
+
+seed: 42
+data_seed: 42
+

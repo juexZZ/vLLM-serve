@@ -5,6 +5,7 @@ from io import BytesIO
 from PIL import Image
 import base64
 import os
+# from vllm import LLM, SamplingParams
 
 from viz_utils import (
     decode_json_points, 
@@ -17,8 +18,8 @@ from viz_utils import (
 MODEL_NAME = "Qwen/Qwen3-VL-235B-A22B-Instruct"
 # MODEL_NAME = "Qwen/Qwen3-VL-8B-Instruct"
 
-openai_api_key = "EMPTY"
-openai_api_base = "http://localhost:8000/v1"
+openai_api_key = "ai4ce"
+openai_api_base = "http://gh116:8000/v1"
 
 HTTP_URL = None
 # HEADERS = {
@@ -75,12 +76,16 @@ def inference_with_openai_api(img_url, prompt, min_pixels=64 * 32 * 32, max_pixe
     completion = client.chat.completions.create(
         model=MODEL_NAME,
         messages=messages,
-        max_tokens=32768,
-        # temperature=0.6,
-        # top_p=0.95,
-        # extra_body={
-        #     "top_k": 20,
-        # },
+        max_tokens=2048,
+        temperature=0.7,
+        top_p=0.8,
+        presence_penalty=1.5,
+        extra_body={
+            "top_k": 20,
+            "min_p": 0.0,
+            "repetition_penalty": 1.0,
+            "greedy": False,
+        },
     )
     return completion.choices[0].message.content
 
@@ -104,7 +109,7 @@ print(model_response)
 image = get_image(img_url)
 
 image.thumbnail([640,640], Image.Resampling.LANCZOS)
-plot_bounding_boxes(image, model_response, save_path="./test_visualizations/dining_table_bbox.png")
+plot_bounding_boxes(image, model_response, save_path="./test_visualizations_nonthinking_sugg_param_235B/dining_table_bbox.png")
 
 
 
@@ -124,4 +129,4 @@ print(model_response)
 image = get_image(img_url)
 
 image.thumbnail([640,640], Image.Resampling.LANCZOS)
-plot_points_json(image, model_response, save_path="./test_visualizations/football_field_points.png")
+plot_points_json(image, model_response, save_path="./test_visualizations_nonthinking_sugg_param_235B/football_field_points.png")

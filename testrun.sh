@@ -5,4 +5,4 @@ export PATH="/ext3/uv:$PATH"
 
 source .venv/bin/activate
 
-uv run python test_mm.py
+python test_mm.py

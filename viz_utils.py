@@ -253,6 +253,9 @@ def plot_points_json(im, text, save_path=None):
     point_2d = item['point_2d']
     label = item['label']
     x, y = int(point_2d[0] / 1000 * width), int(point_2d[1] / 1000 * height)
+    # filter out-of-bound points
+    if x < 0 or x >= width or y < 0 or y >= height:
+      continue
     radius = 2
     draw.ellipse([(x - radius, y - radius), (x + radius, y + radius)], fill=colors[0])
     draw.text((x + 2*radius, y + 2*radius), label, fill=colors[0], font=font)
